@@ -2993,3 +2993,12 @@ html, body {
     }
   }
 }
+
+// #1981 photo credit under the Cities Included box of a collection overlay
+.theme-overlay__credit {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: #94a3b8;
+
+  a { color: #cbd5e1; }
+}

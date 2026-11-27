@@ -160,7 +160,7 @@
               @click="openTheme(theme)"
               class="theme-card"
             >
-              <img :src="`https://loremflickr.com/600/400/${theme.img.split(',')[0]}/all`" class="theme-card__img" />
+              <img :src="thumbUrl(theme.id)" :alt="theme.title" class="theme-card__img" />
               <div class="theme-card__overlay"></div>
               <div class="theme-card__content">
                 <div class="theme-card__header">
@@ -199,6 +199,7 @@
                 <div class="theme-overlay__count-label">Cities Included</div>
                 <div class="theme-overlay__count-value">{{ selectedTheme.query.length }}</div>
               </div>
+              <p v-if="currentCredit" class="theme-overlay__credit">Photo: {{ currentCredit.author }} &middot; <a :href="currentCredit.license_url || currentCredit.source_url" target="_blank" rel="noopener">{{ currentCredit.license }}</a> &middot; <a :href="currentCredit.source_url" target="_blank" rel="noopener">Wikimedia Commons</a></p>
             </div>
           </div>
           <div class="theme-overlay__right">
@@ -984,6 +985,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import type { City, ViewType } from '@/types/mytrips';
 import { initData } from '@/utils/mytrips-data';
 import { travelData } from '@/data/travel-data';
+import { thumbUrl, heroUrl, creditOf, GENERIC_SLIDES } from '@/data/collection-images';
 import Chart from 'chart.js/auto';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -1156,6 +1158,8 @@ const selectedTheme = ref<any>(null);
 const themeOverlayVisible = ref(false);
 const slideshowImages = ref<string[]>([]);
 const currentSlide = ref(0);
+// #1981 the photo of the slide on show: the collection's own, then the two generic ones (credit shown in the overlay)
+const currentCredit = computed(() => creditOf([selectedTheme.value?.id as string, ...GENERIC_SLIDES][currentSlide.value]));
 let slideInterval: number | null = null;
 
 // 16 Curated Collections (from production)
@@ -2347,11 +2351,7 @@ function openTheme(theme: any) {
   currentSlide.value = 0;
 
   // Setup slideshow images
-  slideshowImages.value = [
-    `https://loremflickr.com/1920/1080/${theme.img.split(',')[0]}/all`,
-    'https://loremflickr.com/1920/1080/travel/all',
-    'https://loremflickr.com/1920/1080/landscape/all'
-  ];
+  slideshowImages.value = [heroUrl(theme.id), ...GENERIC_SLIDES.map(heroUrl)];
 
   // Start slideshow
   if (slideInterval) clearInterval(slideInterval);

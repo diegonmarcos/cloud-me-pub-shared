@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [vue()],
   root: 'src',
   base: './',
+  publicDir: resolve(__dirname, 'public'),   // #1981 public/collections (the Collections photos) is copied to dist/collections
   cacheDir: resolve(__dirname, 'node_modules/.vite'),
   build: {
     outDir: '../dist',
